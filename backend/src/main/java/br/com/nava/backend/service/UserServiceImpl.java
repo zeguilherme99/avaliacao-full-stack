@@ -44,7 +44,7 @@ public class UserServiceImpl implements UserService{
     @Override
     public User getUserById(Integer userId) {
         Optional<User> user = userRepository.findById(userId);
-        return user.orElseThrow(() -> new ObjectNotFoundException(userId));
+        return user.orElseThrow(() -> new ObjectNotFoundException("User" ,userId));
     }
 
     public void updateData(User updated, User source) {
