@@ -49,6 +49,7 @@ public class UserServiceImpl implements UserService{
 
     public void updateData(User updated, User source) {
         updated.setName(source.getName());
+        updated.setBankAccounts(source.getBankAccounts());
     }
 
     public User fromDTO(UserDTO userDTO) {

@@ -1,23 +1,30 @@
 package br.com.nava.backend.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@NoArgsConstructor @AllArgsConstructor
+@NoArgsConstructor
 @EqualsAndHashCode(exclude = "name")
 @Getter @Setter
 @Table(name = "tb_user")
 public class User implements Serializable {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     private String name;
+
+    @OneToMany(mappedBy = "user")
+    private List<BankAccount> bankAccounts = new ArrayList<>();
+
+    public User(Integer id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 }
