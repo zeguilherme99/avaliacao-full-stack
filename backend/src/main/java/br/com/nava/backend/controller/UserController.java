@@ -2,7 +2,7 @@ package br.com.nava.backend.controller;
 
 import br.com.nava.backend.dto.UserDTO;
 import br.com.nava.backend.entity.User;
-import br.com.nava.backend.service.UserServiceImpl;
+import br.com.nava.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 public class UserController {
 
     @Autowired
-    private UserServiceImpl service;
+    private UserService service;
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
