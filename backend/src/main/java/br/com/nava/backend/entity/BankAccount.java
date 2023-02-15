@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor
@@ -25,6 +26,9 @@ public class BankAccount implements Serializable {
     @JoinColumn(name = "user_id")
     @JsonIgnore
     private User user;
+
+    @OneToMany
+    private List<Transfer> transfers;
 
     public BankAccount(Integer id, Double balance) {
         this.id = id;
