@@ -1,10 +1,11 @@
 package br.com.nava.backend.service;
 
+import br.com.nava.backend.dto.TransferDTO;
+import br.com.nava.backend.entity.BankAccount;
 import br.com.nava.backend.entity.Transfer;
 import br.com.nava.backend.repository.BankAccountRepository;
 import br.com.nava.backend.repository.TransferRepository;
 import br.com.nava.backend.service.exceptions.InvalidDateTimeException;
-import br.com.nava.backend.service.utils.RateType;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,27 +24,56 @@ public class TransferServiceImpl implements TransferService {
     @Autowired
     private BankAccountRepository bankAccountRepository;
 
-    private RateType rateType;
+    @Autowired
+    private BankAccountService bankAccountService;
+
 
     @Override
     public Transfer createTransfer(Integer sourceAccountId, Integer targetAccountId, Transfer transfer) {
-        double amount = transfer.getAmount();
+        Double amount = transfer.getAmount();
         LocalDate today = LocalDate.now();
-        LocalDate scheduleDate = transfer.getScheduledDate();
-        Double rate = getRate(today, scheduleDate, amount);
+        LocalDate scheduledDate = transfer.getScheduledDate();
+        Double rate = getRate(today, scheduledDate, amount);
 
         if (rate != null) {
             if (bankAccountRepository.existsById(sourceAccountId) || bankAccountRepository.existsById(targetAccountId)) {
-
+                if (bankAccountRepository.existsById(sourceAccountId)) {
+                    if (bankAccountRepository.existsById(targetAccountId)) {
+                        Double totalAmount = amount + rate;
+                        BankAccount sourceAccount = bankAccountService.getBankAccountById(sourceAccountId);
+                        BankAccount targetAccount = bankAccountService.getBankAccountById(targetAccountId);
+                        if (verifyAccountBalance(totalAmount, sourceAccount.getBalance())) {
+                            Double newSourceAccountBalance = sourceAccount.getBalance() - totalAmount;
+                            sourceAccount.setBalance(newSourceAccountBalance);
+                            transfer.setTotalAmount(totalAmount);
+                            transfer.setToday(today);
+                            transfer.setRate(rate);
+                            if (!today.isEqual(scheduledDate)) {
+                                transfer.setStatus("scheduled");
+                            } else {
+                                Double newTargetAccountBalance = targetAccount.getBalance() + totalAmount;
+                                targetAccount.setBalance(newTargetAccountBalance);
+                                transfer.setStatus("concluded");
+                                targetAccount.getTransfers().add(transfer);
+                                bankAccountRepository.save(targetAccount);
+                            }
+                            bankAccountRepository.save(sourceAccount);
+                            sourceAccount.getTransfers().add(transfer);
+                            transferRepository.save(transfer);
+                        }
+                    }
+                }
             }
         }
-
-
     }
 
     @Override
     public List<Transfer> getTransfers() {
-        rateType.
+        return transferRepository.findAll();
+    }
+
+    @Override
+    public Transfer fromDTO(TransferDTO transferDTO) {
         return null;
     }
 
@@ -54,13 +84,15 @@ public class TransferServiceImpl implements TransferService {
             throw new InvalidDateTimeException();
         }
 
-        if (dateDiff == 0 && amount <= 1000) {
-            return amount * 0.03 + 3;
+        if (dateDiff == 0 && amount <= 1000.00) {
+            return amount * 0.03 + 3.00;
         }
-        if (dateDiff <= 10 && amount > 1000 && amount <= 2000) {
+
+        if (dateDiff <= 10 && amount > 1000.00 && amount <= 2000.00) {
             return 12.00;
         }
-        if (dateDiff > 10 && amount > 2000) {
+
+        if (dateDiff > 10 && amount > 2000.00) {
             if (dateDiff <= 20) {
                 return amount * 0.082;
             }
