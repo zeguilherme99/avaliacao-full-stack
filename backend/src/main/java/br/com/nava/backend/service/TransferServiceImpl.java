@@ -29,7 +29,7 @@ public class TransferServiceImpl implements TransferService {
 
 
     @Override
-    public Transfer createTransfer(Integer sourceAccountId, Integer targetAccountId, Transfer transfer) {
+    public void createTransfer(Integer sourceAccountId, Integer targetAccountId, Transfer transfer) {
         Double amount = transfer.getAmount();
         LocalDate today = LocalDate.now();
         LocalDate scheduledDate = transfer.getScheduledDate();
@@ -74,7 +74,7 @@ public class TransferServiceImpl implements TransferService {
 
     @Override
     public Transfer fromDTO(TransferDTO transferDTO) {
-        return null;
+        return new Transfer(transferDTO.getId(), transferDTO.getToday(), transferDTO.getScheduledDate(), transferDTO.getAmount());
     }
 
     private Double getRate(LocalDate today, LocalDate scheduledDate, Double amount) {

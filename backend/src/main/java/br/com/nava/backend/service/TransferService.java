@@ -11,7 +11,7 @@ public interface TransferService {
 
 
 
-    Transfer createTransfer(Integer sourceAccountId, Integer targetAccountId, Transfer transfer);
+    void createTransfer(Integer sourceAccountId, Integer targetAccountId, Transfer transfer);
     List<Transfer> getTransfers();
 
     Transfer fromDTO(TransferDTO transferDTO);
