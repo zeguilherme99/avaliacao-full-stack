@@ -31,4 +31,10 @@ public class Transfer implements Serializable {
     private Double totalAmount;
     private String status;
 
+    public Transfer(Integer id, LocalDate today, LocalDate scheduledDate, Double amount) {
+        this.id = id;
+        this.today = today;
+        this.scheduledDate = scheduledDate;
+        this.amount = amount;
+    }
 }
