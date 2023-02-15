@@ -18,26 +18,26 @@ import java.util.stream.Collectors;
 public class UserController {
 
     @Autowired
-    private UserService service;
+    private UserService userService;
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<UserDTO> findAll() {
-        List<User> list = service.getUsers();
+        List<User> list = userService.getUsers();
         return list.stream().map(UserDTO::new).collect(Collectors.toList());
     }
 
     @GetMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     public UserDTO findById(@PathVariable Integer id) {
-        User user = service.getUserById(id);
+        User user = userService.getUserById(id);
         return new UserDTO(user);
     }
 
     @PostMapping
     public ResponseEntity<Void> save(@RequestBody UserDTO userDTO) {
-        User user = service.fromDTO(userDTO);
-        service.createUser(user);
+        User user = userService.fromDTO(userDTO);
+        userService.createUser(user);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequestUri().path("/{id}").buildAndExpand(user.getId()).toUri();
         return ResponseEntity.created(uri).build();
     }
@@ -45,14 +45,14 @@ public class UserController {
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Integer id) {
-        service.deleteUser(id);
+        userService.deleteUser(id);
     }
 
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void update(@RequestBody UserDTO userDTO, @PathVariable Integer id) {
-        User user = service.fromDTO(userDTO);
+        User user = userService.fromDTO(userDTO);
         user.setId(id);
-        service.updateUser(user);
+        userService.updateUser(user);
     }
 }
